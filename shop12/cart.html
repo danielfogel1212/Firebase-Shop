@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>Fogel's Shop</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"/>
+    <!-- Bootstrap icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"/>
+    <!-- Custom CSS -->
+    <link href="css/styles.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin:15px">
+    <a class="navbar-brand" href="index.html" id="welcome"></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="logout.html">Logout</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    Categories
+                </a>
+                <div class="dropdown-menu" id="menug" aria-labelledby="navbarDropdown">
+                    <!-- Dropdown items go here -->
+                </div>
+            </li>
+        </ul>
+
+        <form action="cart.html" class="d-flex" id="cart" style="margin-right: 10px;">
+            <button class="btn btn-outline-dark" type="submit">
+                <i class="bi-cart-fill me-1"></i>
+                Cart
+                <span class="badge bg-dark text-white ms-1 rounded-pill" id="smallCart"></span>
+            </button>
+        </form>
+
+        <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+    </div>
+</nav>
+
+<!-- Header -->
+<header class="bg-dark py-1">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">Fogel's Shop</h1>
+            <p class="lead fw-normal text-white-50 mb-0">This shop is just a demo</p>
+        </div>
+    </div>
+</header>
+<!-- Header -->
+<div class="container px-3 my-5 clearfix">
+  <!-- Shopping cart table -->
+  <div class="card">
+    <div class="card-header">
+      <h2>Shopping Cart</h2>
+    </div>
+    <section class="h-100" style="background-color: #eee;">
+      <div class="container h-100 py-5">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="col-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h3 class="fw-normal mb-0 text-black">Shopping Cart</h3>
+              <div>
+                <p class="mb-0"><span class="text-muted">Sort by:</span> <a href="#!" class="text-body">price <i class="fas fa-angle-down mt-1"></i></a></p>
+              </div>
+            </div>
+            <div id="products">
+              <div class="text-center" id="load">
+                <div class="spinner-border" role="status">
+                  <span class="sr-only"></span>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <center>
+                  <div id="paypal-button-container"></div>
+                </center>
+                <!-- Include the PayPal JavaScript SDK. Replace <YOUR_CLIENT_ID> with your client ID.-->
+                <script src="https://www.paypal.com/sdk/js?client-id=AeBG5lDg1g13MpxBWye1T8UvPfXXD6Bjhu9tPj5-YJQGOF50mfkZvJVYi6nR4Ktm_kRFsw23m4k1MlRd&currency=ILS"></script>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+           
+        
+        <script type="module">
+
+      
+
+
+
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-app.js";
+import {getFirestore,where, collection,limit,addDoc, getDoc,query, orderBy, limitToLast,onSnapshot, doc,getDocs,deleteField,updateDoc,deleteDoc,setDoc } from 'https://www.gstatic.com/firebasejs/9.9.4/firebase-firestore.js'
+ import { getAuth,createUserWithEmailAndPassword,onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
+
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+
+var A = ['Sunday','Monday','Tuesday','Wednesday','Thursday']
+var array = A + ""
+
+
+
+
+var sum=0
+
+ const firebaseConfig = {
+  apiKey: "AIzaSyB87m7IcXd1gqnSYZEBXqwpQIQbOItRwqY",
+  authDomain: "todos-e7e2f.firebaseapp.com",
+  databaseURL: "https://todos-e7e2f-default-rtdb.firebaseio.com",
+  projectId: "todos-e7e2f",
+  storageBucket: "todos-e7e2f.appspot.com",
+  messagingSenderId: "523425205783",
+  appId: "1:523425205783:web:6fd93bb6f354c361541652"
+};
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    var email=""
+    var limiter1=0
+    var uid = ''
+    onAuthStateChanged(auth, (user) => {
+  if (user) {
+
+    // User is signed in, see docs for a list of available properties
+    // https://firebase.google.com/docs/reference/js/firebase.User
+       uid = user.uid;
+    email = user.email
+     document.getElementById("welcome").innerHTML ="Welcome "+email.split('@')[0]
+    console.log(uid)
+ 
+    showall1()
+smallCart()
+showCategory()
+
+
+
+
+
+  
+   if(!email){
+window.location="login.html"
+}
+    
+    // ...
+  } else {
+     if(!email){
+         window.location="login.html"
+
+}
+    // ...
+  }
+}); 
+
+
+
+let ipd = [];
+let price = [];
+let itemName = [];
+let itmer = 0;
+let fullItem = [];
+let total = 0;
+let fl = "";
+let ft = "";
+
+async function getAll1(item, itemid, qt) {
+  let table = document.getElementById('products');
+  table.innerHTML = "";
+  let row = '';
+  let element = [];
+  let add = [];
+
+  let dataItem = [];
+  const q = query(collection(db, "shop"));
+  total = 0;
+  const unsubscribe = await onSnapshot(q, (querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+      let data = doc.data();
+      if (doc.id == item) {
+        row = `
+        <div class="card rounded-3 mb-4" id="${itemid}">
+          <div class="card-body p-4">
+            <div class="row d-flex justify-content-between align-items-center">
+              <div class="col-md-2 col-lg-2 col-xl-2">
+                <img src="${data.image}" class="img-fluid rounded-3" alt="Cotton T-shirt">
+              </div>
+              <div class="col-md-3 col-lg-3 col-xl-3">
+                <p class="lead fw-normal mb-2">${data.itemName}</p>
+                Free Shipping
+              </div>
+              <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
+                <button class="btn btn-link px-2" onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                  <i class="fas fa-minus"></i>
+                </button>
+                <input id="form1" min="0" name="quantity" value="" type="number" class="form-control form-control-sm" />
+                <button class="btn btn-link px-2" onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+              <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
+                <h5 class="mb-0">${data.price}</h5>
+              </div>
+              <div class="col-md-1 col-lg-1 col-xl-1 text-end">
+                <a href="#!" class="text-danger"><button class="btn btn-danger" id="${itemid}">x</button></i></a>
+              </div>
+            </div>
+          </div>
+        </div>`;
+
+        let number = parseFloat(data.price.substring(3));
+        total += Number(number);
+        price.push(data.price);
+        itemName.push(data.itemName);
+        fl += fullItem[itmer];
+        itmer += 1;
+
+        let table = document.getElementById('products');
+        table.innerHTML += row;
+
+        ipd.push(itemid);
+        let element123 = document.getElementsByClassName('btn btn-danger');
+        for (let x = 0; x < element123.length; x++) {
+          element123[x].addEventListener("click", delete1);
+        }
+      }
+    });
+  });
+}
+
+
+
+   
+
+
+
+function smallCart() {
+  const q = query(collection(db, "cart"));
+  const q1 = query(q, where("userId", "==", uid));
+
+  const unsubscribe = onSnapshot(q1, (querySnapshot) => {
+    let sum = 0;
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.product) {
+        sum += 1;
+      }
+    });
+
+    document.getElementById("smallCart").innerHTML = sum;
+  });
+}
+
+function showall1() {
+  const q = query(collection(db, "cart"), where("userId", "==", uid));
+
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      getAll1(data.product, doc.id, data.qt);
+    });
+    getAll1("", "");
+  });
+}
+
+async function delete1() {
+  await deleteDoc(doc(db, "cart", this.id));
+}
+
+let bl = "";
+function initPayPalButton() {
+  paypal.Buttons({
+    style: {
+      shape: "rect",
+      color: "gold",
+      layout: "vertical",
+      label: "paypal",
+    },
+
+    createOrder: function (data, actions) {
+      for (let x = 0; x < fullItem.length; x++) {
+        // bl= fullItem[x]
+      }
+      return actions.order.create({
+        purchase_units: [
+          {
+            amount: {
+              currency_code: "ILS",
+              value: total,
+              breakdown: {
+                item_total: {
+                  currency_code: "ILS",
+                  value: total,
+                },
+              },
+            },
+            items: [
+              // bl
+            ],
+          },
+        ],
+      });
+    },
+
+    onApprove: function (data, actions) {
+      return actions.order
+        .capture()
+        .then(function (orderData) {
+          // Full available details
+          console.log(
+            "Capture result",
+            orderData,
+            JSON.stringify(orderData, null, 2)
+          );
+
+          // Show a success message within this page, for example:
+          const element = document.getElementById("paypal-button-container");
+          element.innerHTML = "";
+          element.innerHTML =
+            '<h3>Thank you for your payment!</h3>';
+
+          // Or go to another URL:  actions.redirect('thank_you.html');
+        });
+    },
+
+    onError: function (err) {
+      console.log(err);
+    },
+  }).render("#paypal-button-container");
+  total = 0;
+}
+
+initPayPalButton();
+
+function showCategory() {
+  const q = query(collection(db, "category"));
+  let menuc = "";
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      console.log(doc.id);
+      menuc += `<a class="dropdown-item" href="category.html?id=${doc.id}">${data.catName}</a>`;
+    });
+    document.getElementById("menug").innerHTML += menuc;
+  });
+}
+</script>
+</body>
+</html>

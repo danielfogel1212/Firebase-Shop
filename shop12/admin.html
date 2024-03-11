@@ -1,0 +1,337 @@
+
+<html lang="en">
+    <head>
+        <style>
+.buttonload {
+  background-color: #04AA6D; /* Green background */
+  border: none; /* Remove borders */
+  color: white; /* White text */
+  padding: 12px 24px; /* Some padding */
+  font-size: 16px; /* Set a font-size */
+}
+
+/* Add a right margin to each icon */
+.fa {
+  margin-left: -12px;
+  margin-right: 8px;
+}
+#load{
+    visibility: hidden;
+
+}
+</style>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Fogel's Shop</title>
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <!-- Bootstrap icons-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="css/styles.css" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- Navigation-->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container px-4 px-lg-5">
+                <a class="navbar-brand" href="logout.html" >Logout</a>
+              
+                    <form action="cart.html" class="d-flex" id="cart">
+                        <button  class="btn btn-outline-dark" type="submit">
+                            <i class="bi-cart-fill me-1"></i>
+                            Cart
+                            <span class="badge bg-dark text-white ms-1 rounded-pill" id="smallCart"></span>
+
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+        <!-- Header-->
+        <header class="bg-dark py-1">
+            <div class="container px-4 px-lg-5 my-5">
+                <div class="text-center text-white">
+                    <h1 class="display-4 fw-bolder" href="index.html">Fogel's Shop</h1>
+                    <p class="lead fw-normal text-white-50 mb-0">This shop is just a demo</p>
+                </div>
+            </div>
+        </header>
+        <!-- Section-->
+        <section class="py-5">
+            <div class="container px-4 px-lg-5 mt-5">
+                        <center>
+
+                 <br><br>
+                  <input type="text" id="addC" name="">
+                  <br><br>
+                   <button type="button" id="prc"  class="btn btn-primary" >Add Category</button>
+                  <select id="mySelect"  class="btn btn-success">
+                       
+                     </select>
+                  <br><br>
+             <input type="text" id="addP" name="">
+             <br>
+             <br>
+             <button type="button" id="pr"  class="btn btn-primary" >Add Products</button>
+
+                   
+ <br><br>
+  <div class="text-center" id="load">
+  <div class="spinner-border" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+
+</button>
+             </center>
+                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center" id="products">
+                 
+                    
+                            <!-- Product actions-->
+                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                       
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <!-- Footer-->
+ 
+        <!-- Bootstrap core JS-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+        <!-- Core theme JS-->
+        <script type="module">
+
+
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-app.js";
+import {getFirestore,where, collection,addDoc, getDoc,query, orderBy, limit,onSnapshot, doc,getDocs,deleteField,updateDoc,deleteDoc,setDoc } from 'https://www.gstatic.com/firebasejs/9.9.4/firebase-firestore.js'
+ import { getAuth,createUserWithEmailAndPassword,onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB87m7IcXd1gqnSYZEBXqwpQIQbOItRwqY",
+  authDomain: "todos-e7e2f.firebaseapp.com",
+  databaseURL: "https://todos-e7e2f-default-rtdb.firebaseio.com",
+  projectId: "todos-e7e2f",
+  storageBucket: "todos-e7e2f.appspot.com",
+  messagingSenderId: "523425205783",
+  appId: "1:523425205783:web:6fd93bb6f354c361541652"
+};
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    var email=""
+    var limiter1=0
+    var uid = ''
+    onAuthStateChanged(auth, (user) => {
+  if (user) {
+
+    // User is signed in, see docs for a list of available properties
+    // https://firebase.google.com/docs/reference/js/firebase.User
+       uid = user.uid;
+    email = user.email
+    console.log(uid)
+    smallCart()
+    category()
+
+  
+   if(!email){
+window.location="login.html"
+}
+    
+    // ...
+  } else {
+     if(!email){
+         window.location="login.html"
+limiter()
+}
+    // ...
+  }
+}); 
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+} 
+
+
+const q = query(collection(db, "shop"));
+
+document.getElementById('pr').addEventListener("click", getProduct)
+document.getElementById('prc').addEventListener("click", addCategory)
+const unsubscribe =  onSnapshot(q, (querySnapshot) => {
+    let table = document.getElementById('products')
+   table.innerHTML = ""
+   var dataItem=[]
+  querySnapshot.forEach((doc) => {
+//   console.log(doc.id, " => ", doc.data());
+var product = ""
+let data = doc.data()
+let row  = `   <div class="col mb-5">
+                        <div class="card h-100">
+                            <!-- Product image-->
+                            <img class="card-img-top" src="${data.image}" width="250" height="200" alt="..." />
+                            <!-- Product details-->
+                            <div class="card-body p-4">
+                                <div class="text-center">
+                                    <!-- Product name-->
+                                    <h5 class="fw-bolder" >  <input id="itemName${doc.id}" type="text" value="${data.itemName}"></h5>
+                                    <!-- Product price-->
+                                    <input type="text" id="price${doc.id}" value="${data.price}">
+                                </div>
+                            </div>
+                            <!-- Product actions-->
+                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                <div class="text-center"><button class="btn btn-danger" id="${doc.id}" href="product.html?id=${data.itemName}" style="text-decoration:none">Delete Product</button></div>
+                                <div class="card-footer p-4 pt-0 border-top-0 bg-transparent"></div>
+                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" style="background:lightblue" id="${doc.id}">Update Product</a></div>
+                            </div>
+                        </div>
+                    `;
+
+   let table = document.getElementById('products')
+   table.innerHTML += row
+ dataItem.push(doc.id)
+      let addProduct = document.getElementsByClassName("btn btn-outline-dark mt-auto");
+   
+   for(var y=0;y<addProduct.length;y++){
+       
+    addProduct[y].myParam = dataItem[y]
+addProduct[y].addEventListener("click", add);
+}
+
+
+  let deleteProduct = document.getElementsByClassName("btn btn-danger");
+   
+   for(var y=0;y<deleteProduct.length;y++){
+       
+    deleteProduct[y].myParam = dataItem[y]
+deleteProduct[y].addEventListener("click", deleteProduct1);
+}
+
+  
+
+  
+ 
+  });
+ 
+ 
+});
+async function deleteProduct1(){
+
+
+
+await deleteDoc(doc(db, "shop", this.id));
+
+
+}
+async function add(evt)
+{ 
+    console.log(this.id)
+    var sl = document.getElementById(this.id)
+    const washingtonRef = doc(db, "shop", this.id);
+// Set the "capital" field of the city 'DC'
+await updateDoc(washingtonRef, {
+  itemName:document.getElementById('itemName'+this.id).value,
+  price:document.getElementById('price'+this.id).value
+});
+}
+
+
+function smallCart(){
+
+
+const q = query(collection(db, "cart"));
+const q1 = query(q, where("userId","==",uid));
+
+
+const unsubscribe =  onSnapshot(q1, (querySnapshot) => {
+var sum =0
+
+  querySnapshot.forEach((doc) => {
+
+  let data = doc.data()
+  if(data.product){
+    sum=sum+1
+ 
+  }
+  });
+
+ 
+  document.getElementById("smallCart").innerHTML=sum
+});
+   
+ 
+}
+function category(){
+
+
+const q = query(collection(db, "category"));
+
+
+const unsubscribe =  onSnapshot(q, (querySnapshot) => {
+var sum =0
+let catName1 =""
+  querySnapshot.forEach((doc) => {
+
+  let data = doc.data()
+  catName1 += ` <option value="${doc.id}">${data.catName}</option>`
+   console.log(data.catName)
+  });
+  document.getElementById("mySelect").innerHTML=catName1
+
+ 
+ 
+});
+   
+ 
+}
+async function getProduct(){
+   var catName2 = document.getElementById("mySelect").value
+   document.getElementById("load").style.visibility = "visible"
+           try {
+                          const response = await fetch('http://localhost:5000/'+document.getElementById("addP").value);
+               var data = await response.json();
+               for(var x in data){
+                console.log(data[x]['head'])
+                console.log(data[x]['price'])
+                console.log(data[x]['image'])
+               const docRef = await addDoc(collection(db, "shop"), {
+  itemName: data[x]['head'],
+  price: data[x]['price'],
+  image: data[x]['image'],
+  catName:catName2
+});
+     }
+
+          
+               
+  document.getElementById("load").style.visibility = "hidden"
+            }
+
+
+             catch (error) {
+                console.log(error);
+            }   
+     }
+ async function addCategory(){
+ var ct = document.getElementById("addC").value
+             const docRef = await addDoc(collection(db, "category"), {
+  catName:ct
+})
+}
+        </script>
+        
+    </body>
+</html>
